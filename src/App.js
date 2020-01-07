@@ -1,14 +1,61 @@
-/**
- * Challenge: build the basic structure of our game
- * 
- * 1. <h1> title at the top
- * 2. <textarea> for the box to type in 
- *      (tip: React normalizes <textarea /> to be more like <input />, 
- *      so it can be used as a self-closing element and uses the `value` property
- *      to set its contents)
- * 3. <h4> ti display the amount of time remaining
- * 4. <button> to start the game
- * 5. Another <h1> to display the word count
- */
+import React, { useState, useEffect } from 'react'
 
- 
+const App = () => {
+  const TIME = 5
+  const [text, setText] = useState('')
+  const [timeRemaining, setTimeRemaining] = useState(TIME)
+  const [isTimeRunning, setIsTimeRunning] = useState(false)
+  const [wordCount, setWordCount] = useState(0)
+
+  const handleChange = (event) => {
+    const { value } = event.target
+    setText(value)
+  }
+
+  const calculateWords = (str) => {
+    const wordsArray =  str.trim().split(' ')
+    return wordsArray.filter(word => word !== '').length
+  }
+
+  const startGame = () => {
+    setIsTimeRunning(true)
+    setTimeRemaining(TIME)
+    setText('')
+  }
+
+  const endGame = () => {
+    setIsTimeRunning(false)
+    setWordCount(calculateWords(text))
+  }
+
+  useEffect(() => {
+    if(isTimeRunning && timeRemaining > 0) {
+      setTimeout(() => {
+          setTimeRemaining(time => time - 1)
+      }, 1000)
+    } else if(timeRemaining === 0) {
+      endGame()
+    }
+  }, [timeRemaining, isTimeRunning])
+
+  return (
+    <>
+      <h1>Speed Typing Game</h1>
+      <textarea 
+        onChange={handleChange} 
+        disabled={!isTimeRunning}
+        value={text} 
+      />
+      <h4>Time remaining: { timeRemaining }</h4>
+      <button 
+        onClick={startGame} 
+        disabled={isTimeRunning}
+      >
+        Start
+      </button>
+      <h1>Word count: { wordCount }</h1>
+    </>
+  )
+}
+
+export default App
